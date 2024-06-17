@@ -1,9 +1,10 @@
 import argparse
 import warnings
 
-from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import log_loss
 from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+
 
 import flwr as fl
 import utils
@@ -23,6 +24,7 @@ PATH_TEST_SBJ = "../UCI_HAR_Dataset/test/subject_test.txt"
 
 PATH_FT = "../UCI_HAR_Dataset/features.txt"
 features = pd.read_csv(PATH_FT, sep=" ", header=None, index_col=0).reset_index()
+
 
 if __name__ == "__main__":
     N_CLIENTS = 30
@@ -50,11 +52,7 @@ if __name__ == "__main__":
     print(f"X_train shape: {X_train.shape}\nX_test shape: {X_test.shape}\ny_train shape: {y_train.shape}\ny_test shape: {y_test.shape}")
 
     # Create LogisticRegression Model
-    model = LogisticRegression(
-        penalty="l2",
-        max_iter=1,  # local epoch
-        warm_start=True,  # prevent refreshing weights when fitting
-    )
+    model = RandomForestClassifier(n_estimators=100, random_state=42)
 
     # Setting initial parameters, akin to model.compile for keras models
     utils.set_initial_params(model)
