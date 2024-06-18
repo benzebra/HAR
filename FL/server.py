@@ -3,13 +3,13 @@ import flwr as fl
 import utils
 from sklearn.metrics import log_loss
 from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-import pandas as pd
 
 from typing import Dict
 
-from flwr_datasets import FederatedDataset
+import pandas as pd
+
+from typing import Dict
 
 PATH_TRAIN_X = "../UCI_HAR_Dataset/train/X_train.txt"
 PATH_TRAIN_Y = "../UCI_HAR_Dataset/train/y_train.txt"
@@ -43,10 +43,13 @@ def get_evaluate_fn(model: LogisticRegression):
 
     y_train_col = pd.read_fwf(PATH_TRAIN_Y, header=None)
     print(f"x_train shape: {df_x_train.shape}\ny_train shape: {y_train_col.shape}")
-    
-    # SPLITTING
-    X_train, X_test, y_train, y_test = train_test_split(df_x_train, y_train_col, random_state=42, test_size=0.3)
-    print(f"X_train shape: {X_train.shape}\nX_test shape: {X_test.shape}\ny_train shape: {y_train.shape}\ny_test shape: {y_test.shape}")
+
+    X_test = pd.read_fwf(PATH_TEST_X, header=None)
+    X_test.rename(columns=features[1], inplace=True)
+
+    y_test = pd.read_fwf(PATH_TEST_Y, header=None)
+
+    print(f"x_test shape: {X_test.shape}\ny_test shape: {y_test.shape}")
 
     # The `evaluate` function will be called after every round
     def evaluate(server_round, parameters: fl.common.NDArrays, config):
@@ -61,8 +64,7 @@ def get_evaluate_fn(model: LogisticRegression):
 
 # Start Flower server for five rounds of federated learning
 if __name__ == "__main__":
-    # model = LogisticRegression()
-    model = RandomForestClassifier()
+    model = LogisticRegression()
     utils.set_initial_params(model)
     strategy = fl.server.strategy.FedAvg(
         min_available_clients=2,

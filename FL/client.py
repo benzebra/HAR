@@ -3,12 +3,11 @@ import warnings
 
 from sklearn.metrics import log_loss
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 
 
 import flwr as fl
 import utils
-from flwr_datasets import FederatedDataset
 
 import pandas as pd
 
@@ -52,12 +51,16 @@ if __name__ == "__main__":
     print(f"X_train shape: {X_train.shape}\nX_test shape: {X_test.shape}\ny_train shape: {y_train.shape}\ny_test shape: {y_test.shape}")
 
     # Create LogisticRegression Model
-    model = RandomForestClassifier(n_estimators=100, random_state=42)
+    model = LogisticRegression(
+        penalty="l2",
+        max_iter=1,  # local epoch
+        warm_start=True,  # prevent refreshing weights when fitting
+    )
 
     # Setting initial parameters, akin to model.compile for keras models
     utils.set_initial_params(model)
 
-    # Define Flower client
+    # Define client
     class MnistClient(fl.client.NumPyClient):
         def get_parameters(self, config):  # type: ignore
             return utils.get_model_parameters(model)
