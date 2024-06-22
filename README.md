@@ -21,15 +21,27 @@ The dataset used in these examples is the [Human Activity Recognition Using Smar
 
 The repository contains the following Jupyter notebooks:
 
-### 1. Centralized Learning
+### 1. Centralized Learning - sklearn
 
-- **Notebook Directory**: `CL`
+- **Notebook Directory**: `CL-sklearn`
 - **Description**: This notebook demonstrates the implementation of a centralized learning model using `scikit-learn`. All data is aggregated on a central server for training.
 - **Dependencies**: `scikit-learn`
 
-### 2. Federated Learning
+### 2. Federated Learning - sklearn
 
-- **Notebook Directory**: `FL`
+- **Notebook Directory**: `FL-sklearn`
+- **Description**: This notebook demonstrates the implementation of a federated learning model using the Flower framework. The training is distributed across multiple devices, and only model updates are shared with a central server.
+- **Dependencies**: `flwr` ([flwr | link](https://flower.ai/))
+
+### 3. Centralized Learning - tensorflow
+
+- **Notebook Directory**: `CL-tensorflow`
+- **Description**: This notebook demonstrates the implementation of a centralized learning model using `tensorflow`. All data is aggregated on a central server for training.
+- **Dependencies**: `tensorflow`
+
+### 4. Federated Learning - tensorflow
+
+- **Notebook Directory**: `FL-tensorflow`
 - **Description**: This notebook demonstrates the implementation of a federated learning model using the Flower framework. The training is distributed across multiple devices, and only model updates are shared with a central server.
 - **Dependencies**: `flwr` ([flwr | link](https://flower.ai/))
 
