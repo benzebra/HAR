@@ -1,4 +1,5 @@
 /UCI_HAR_Dataset
 /notebooks-test
-/FL/__pycache__
+FL-sklearn/__pycache__
+/FL-pytorch
 .DS_Store
