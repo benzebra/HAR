@@ -35,12 +35,12 @@ I think that tensorflow could be the most suitable solution for all of the probl
 
 | PyTorch                           | Keras                                          |
 |-----------------------------------|------------------------------------------------|
-| `Conv2d(1, 32, kernel_size=3)`    | `Conv2D(32, kernel_size=3)`                    |
-| `MaxPool2d(2, stride=2)`          | `MaxPooling2D(pool_size=(2, 2), strides=2)`    |
-| `Conv2d(32, 64, kernel_size=3)`   | `Conv2D(64, kernel_size=3)`                    |
-| `Dropout(0.25)`                   | `Dropout(0.25)`                                |
-| `Flatten()`                       | `Flatten()`                                    |
-| `Linear(9216, 128)`               | `Dense(128, activation="linear")`              |
-| `Dropout(0.5)`                    | `Dropout(0.5)`                                 |
-| `Linear(128, num_classes)`        | `Dense(num_classes, activation="linear")`      |
-| `ReLU()`                          | `ReLU`                                         |
+|  Conv2d(1, 32, kernel_size=3)     |  Conv2D(32, kernel_size=3)                     |
+|  MaxPool2d(2, stride=2)           |  MaxPooling2D(pool_size=(2, 2), strides=2)     |
+|  Conv2d(32, 64, kernel_size=3)    |  Conv2D(64, kernel_size=3)                     |
+|  Dropout(0.25)                    |  Dropout(0.25)                                 |
+|  Flatten()                        |  Flatten()                                     |
+|  Linear(9216, 128)                |  Dense(128, activation="linear")               |
+|  Dropout(0.5)                     |  Dropout(0.5)                                  |
+|  Linear(128, num_classes)         |  Dense(num_classes, activation="linear")       |
+|  ReLU()                           |  ReLU                                          |
