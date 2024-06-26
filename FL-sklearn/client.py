@@ -30,11 +30,11 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Flower")
     parser.add_argument(
-        "--partition-id",
+        "--user",
         type=int,
         choices=range(0, N_CLIENTS),
         required=True,
-        help="Specifies the artificial data partition",
+        help="Specifies the user (--user)",
     )
     args = parser.parse_args()
     partition_id = args.partition_id

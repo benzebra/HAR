@@ -44,3 +44,16 @@ I think that tensorflow could be the most suitable solution for all of the probl
 |  Dropout(0.5)                     |  Dropout(0.5)                                  |
 |  Linear(128, num_classes)         |  Dense(num_classes, activation="linear")       |
 |  ReLU()                           |  ReLU                                          |
+
+---
+
+Used model un tensorflow scritps
+ -> `tf.keras.Sequential` with different layers:
+|index| layer                                                          |explaination | transform   |
+|-----|----------------------------------------------------------------|-------------|-------------|
+| 1   | Dense(512, activation='relu', input_shape=(X_train.shape[1],)) | ReLU        | 7352 -> 512 |
+| 2   | Dropout(0.5)                                                   | Dropout 50% | ---         |
+| 3   | Dense(256, activation='relu')                                  | ReLU        | 512 -> 256  |
+| 4   | Dropout(0.5)                                                   | Dropout 50% | ---         |
+| 5   | Dense(128, activation='relu')                                  | ReLU        | 256 -> 128  |
+| 6   | Dense(6, activation='softmax')                                 | SoftMax     | 128 -> 6    |
