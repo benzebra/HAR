@@ -10,6 +10,10 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
+import argparse
+import warnings
+import utils
+
 # folder dataset
 PATH_TRAIN_X = "../UCI_HAR_Dataset/train/X_train.txt"
 PATH_TRAIN_Y = "../UCI_HAR_Dataset/train/y_train.txt"
@@ -36,8 +40,6 @@ y_train_col = pd.read_fwf(PATH_TRAIN_Y, header=None)
 X = np.array(df_x_train)
 y = np.array(y_train_col)
 
-# TODO: add the subject filter (in: sbj number)
-
 # splitting and scaling
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 scaler = StandardScaler()
@@ -54,18 +56,42 @@ model = tf.keras.Sequential([
 ])
 model.compile("adam", "sparse_categorical_crossentropy", metrics=["accuracy"])
 
-class UCIHARClient(fl.client.NumPyClient):
-    def get_parameters(self, config):
-        return model.get_weights()
+if __name__ == "__main__":
+    N_CLIENTS = 30
 
-    def fit(self, parameters, config):
-        model.set_weights(parameters)
-        model.fit(X_train, y_train, epochs=1, batch_size=32, steps_per_epoch=3)
-        return model.get_weights(), len(X_train), {}
+    # get the input user
+    parser = argparse.ArgumentParser(description="Flower")
+    parser.add_argument(
+        "--user",
+        type=int,
+        choices=range(0, N_CLIENTS),
+        required=True,
+        help="Specifies the user (--user)",
+    )
+    args = parser.parse_args()
+    user = args.user
 
-    def evaluate(self, parameters, config):
-        model.set_weights(parameters)
-        loss, accuracy = model.evaluate(X_test, y_test)
-        return loss, len(X_test), {"accuracy": float(accuracy)}
+    utils.set_initial_params(model)
+
+    # TODO: add the subject filter (in: sbj number)
+    #
+    # [...] query to get the user-th datas from the df
+    # X_user_train, y_user_train, X_user_test, y_user_test = ...
+
+    class UCIHARClient(fl.client.NumPyClient):
+        def get_parameters(self, config):
+            return model.get_weights()
+
+        def fit(self, parameters, config):
+            model.set_weights(parameters)
+            model.fit(X_user_train, y_user_train, epochs=1, batch_size=32, steps_per_epoch=3)
+            return model.get_weights(), len(X_user_train), {}
+
+        def evaluate(self, parameters, config):
+            model.set_weights(parameters)
+            loss, accuracy = model.evaluate(X_user_test, y_user_test)
+            return loss, len(X_user_test), {"accuracy": float(accuracy)}
     
+
+# start the client
 fl.client.start_client(server_address="[::]:8080", client=UCIHARClient().to_client())

@@ -34,10 +34,10 @@ if __name__ == "__main__":
         type=int,
         choices=range(0, N_CLIENTS),
         required=True,
-        help="Specifies the user (--user)",
+        help="Specifies the user",
     )
     args = parser.parse_args()
-    partition_id = args.partition_id
+    user = args.user
 
     # Load the partition data
     df_x_train = pd.read_fwf(PATH_TRAIN_X, header=None)
