@@ -73,11 +73,35 @@ if __name__ == "__main__":
 
     utils.set_initial_params(model)
 
-    # TODO: add the subject filter (in: sbj number)
-    #
-    # [...] query to get the user-th datas from the df
-    # X_user_train, y_user_train, X_user_test, y_user_test = ...
+    # ---------------
+    # user splitting
 
+    df_sbj = pd.read_fwf(PATH_TRAIN_SBJ, header=None)
+
+    user_index = user                       # I want to know user-th infos
+    usr_act = []                            # activity made by user
+    arr_sbj = (df_sbj.iloc[:,0]).to_list()
+
+    for i in range(len(arr_sbj)):
+        if(arr_sbj[i] == user_index):
+            usr_act.append(i)
+    
+    df_ext = pd.DataFrame(dtype=float)
+
+    for i in range(len(usr_act)):
+        index = usr_act[i]
+        new_row = df_x_train.iloc[index]
+        df_ext = pd.concat([df_ext, new_row], ignore_index=True, axis=1)
+
+    df_ext = df_ext.T
+    
+    if(len(df_ext) != 0):
+        X_user_train, X_user_test, y_user_train, y_user_test = train_test_split(df_ext)
+    else:
+        X_user_train, X_user_test, y_user_train, y_user_test = []
+
+    # ----------------
+                          
     class UCIHARClient(fl.client.NumPyClient):
         def get_parameters(self, config):
             return model.get_weights()
