@@ -47,7 +47,8 @@ X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
 model = tf.keras.Sequential([
-    layers.Dense(512, activation='relu', input_shape=(X_train.shape[1],)),
+    layers.InputLayer(shape=(X_train.shape[1],)),
+    layers.Dense(512, activation='relu'),
     layers.Dropout(0.5),
     layers.Dense(256, activation='relu'),
     layers.Dropout(0.5),
@@ -59,7 +60,8 @@ model.compile("adam", "sparse_categorical_crossentropy", metrics=["accuracy"])
 if __name__ == "__main__":
     N_CLIENTS = 30
 
-    # get the input user
+    # ---------------
+    # get the user input
     parser = argparse.ArgumentParser(description="Flower")
     parser.add_argument(
         "--user",
@@ -70,12 +72,12 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     user = args.user
+    # ---------------
 
-    utils.set_initial_params(model)
+    # utils.set_initial_params(model)
 
     # ---------------
     # user splitting
-
     df_sbj = pd.read_fwf(PATH_TRAIN_SBJ, header=None)
 
     user_index = user                       # I want to know user-th infos
@@ -87,35 +89,40 @@ if __name__ == "__main__":
             usr_act.append(i)
     
     df_ext = pd.DataFrame(dtype=float)
+    y_ext = pd.DataFrame(dtype=float)
 
     for i in range(len(usr_act)):
         index = usr_act[i]
-        new_row = df_x_train.iloc[index]
-        df_ext = pd.concat([df_ext, new_row], ignore_index=True, axis=1)
+        new_row_x = df_x_train.iloc[index]
+        df_ext = pd.concat([df_ext, new_row_x], ignore_index=True, axis=1)
+        new_row_y = y_train_col.iloc[index]
+        y_ext = pd.concat([y_ext, new_row_y], ignore_index=True, axis=1)
 
     df_ext = df_ext.T
-    
+    y_ext = y_ext.T
+    X = np.array(df_ext)
+    y = np.array(y_ext)
+
     if(len(df_ext) != 0):
-        X_user_train, X_user_test, y_user_train, y_user_test = train_test_split(df_ext)
+        X_user_train, X_user_test, y_user_train, y_user_test = train_test_split(X, y, random_state=42, test_size=0.3)
     else:
         X_user_train, X_user_test, y_user_train, y_user_test = []
-
     # ----------------
                           
-    class UCIHARClient(fl.client.NumPyClient):
-        def get_parameters(self, config):
-            return model.get_weights()
+#     class UCIHARClient(fl.client.NumPyClient):
+#         def get_parameters(self, config):
+#             return model.get_weights()
 
-        def fit(self, parameters, config):
-            model.set_weights(parameters)
-            model.fit(X_user_train, y_user_train, epochs=1, batch_size=32, steps_per_epoch=3)
-            return model.get_weights(), len(X_user_train), {}
+#         def fit(self, parameters, config):
+#             model.set_weights(parameters)
+#             model.fit(X_user_train, y_user_train, epochs=1, batch_size=32, steps_per_epoch=3)
+#             return model.get_weights(), len(X_user_train), {}
 
-        def evaluate(self, parameters, config):
-            model.set_weights(parameters)
-            loss, accuracy = model.evaluate(X_user_test, y_user_test)
-            return loss, len(X_user_test), {"accuracy": float(accuracy)}
+#         def evaluate(self, parameters, config):
+#             model.set_weights(parameters)
+#             loss, accuracy = model.evaluate(X_user_test, y_user_test)
+#             return loss, len(X_user_test), {"accuracy": float(accuracy)}
     
 
-# start the client
-fl.client.start_client(server_address="[::]:8080", client=UCIHARClient().to_client())
+# # start the client
+# fl.client.start_client(server_address="[::]:8080", client=UCIHARClient().to_client())
