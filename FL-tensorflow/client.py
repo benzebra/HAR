@@ -40,6 +40,10 @@ y_train_col = pd.read_fwf(PATH_TRAIN_Y, header=None)
 X = np.array(df_x_train)
 y = np.array(y_train_col)
 
+# TODO: testing dataframe
+# df_x_test ...???
+# y_test_col ...???
+
 # splitting and scaling
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 scaler = StandardScaler()
@@ -74,55 +78,94 @@ if __name__ == "__main__":
     user = args.user
     # ---------------
 
-    # utils.set_initial_params(model)
+    utils.set_initial_params(model)
 
     # ---------------
     # user splitting
-    df_sbj = pd.read_fwf(PATH_TRAIN_SBJ, header=None)
+    df_sbj_train = pd.read_fwf(PATH_TRAIN_SBJ, header=None)
 
-    user_index = user                       # I want to know user-th infos
-    usr_act = []                            # activity made by user
-    arr_sbj = (df_sbj.iloc[:,0]).to_list()
+    user_index = user                               # I want to know user-th infos
+    usr_act_train = []                              # activity made by user
+    arr_sbj_train = (df_sbj_train.iloc[:,0]).to_list()
 
-    for i in range(len(arr_sbj)):
-        if(arr_sbj[i] == user_index):
-            usr_act.append(i)
+    for i in range(len(arr_sbj_train)):
+        if(arr_sbj_train[i] == user_index):
+            usr_act_train.append(i)
     
     df_ext = pd.DataFrame(dtype=float)
     y_ext = pd.DataFrame(dtype=float)
 
-    for i in range(len(usr_act)):
-        index = usr_act[i]
-        new_row_x = df_x_train.iloc[index]
+    for i in range(len(usr_act_train)):
+        index = usr_act_train[i]
+        new_row_x = df_x_train.iloc[index,:561]
         df_ext = pd.concat([df_ext, new_row_x], ignore_index=True, axis=1)
         new_row_y = y_train_col.iloc[index]
         y_ext = pd.concat([y_ext, new_row_y], ignore_index=True, axis=1)
 
     df_ext = df_ext.T
     y_ext = y_ext.T
-    X = np.array(df_ext)
-    y = np.array(y_ext)
+    # X = np.array(df_ext)
+    # y = np.array(y_ext)
+    X_user_train = np.array(df_ext)
+    y_user_train = np.array(y_ext)
 
-    if(len(df_ext) != 0):
-        X_user_train, X_user_test, y_user_train, y_user_test = train_test_split(X, y, random_state=42, test_size=0.3)
-    else:
-        X_user_train, X_user_test, y_user_train, y_user_test = []
+    # if(len(df_ext) != 0):
+    #     X_user_train, X_user_test, y_user_train, y_user_test = train_test_split(X, y, random_state=42, test_size=0.3)
+    # else:
+    #     X_user_train, X_user_test, y_user_train, y_user_test = []
+
+    df_sbj_test = pd.read_fwf(PATH_TEST_SBJ, header=None)
+
+    user_index = user                               # I want to know user-th infos
+    usr_act_test = []                               # activity made by user
+    arr_sbj_test = (df_sbj_test.iloc[:,0]).to_list()
+
+    for i in range(len(arr_sbj_test)):
+        if(arr_sbj_test[i] == user_index):
+            usr_act_test.append(i)
+    
+    df_ext = pd.DataFrame(dtype=float)
+    y_ext = pd.DataFrame(dtype=float)
+
+    for i in range(len(usr_act_test)):
+        index = usr_act_test[i]
+        new_row_x = df_x_test.iloc[index,:561]
+        df_ext = pd.concat([df_ext, new_row_x], ignore_index=True, axis=1)
+        new_row_y = y_test_col.iloc[index]
+        y_ext = pd.concat([y_ext, new_row_y], ignore_index=True, axis=1)
+
+    df_ext = df_ext.T
+    y_ext = y_ext.T
+
+    X_user_test = np.array(df_ext)
+    y_user_test = np.array(y_ext)
+
+    print(f"User {user} has {len(X_user_train)} training samples and {len(X_user_test)} testing samples")
+    print(f"train shape: {X_user_train.shape}, test shape: {X_user_test.shape}")
+    print(f"y_train shape: {y_user_train.shape}, y_test shape: {y_user_test.shape}")
+
+    # TODO: 
+    # if test.shape = [0,0] and train.shape != [0,0] use the train_test_split function
+    # train_test_split(X, y, random_state=42, test_size=0.3)
+    # 
+    # if train.shape = [0,0] but test.shape != [0,0] ... ???
     # ----------------
                           
-#     class UCIHARClient(fl.client.NumPyClient):
-#         def get_parameters(self, config):
-#             return model.get_weights()
+    class UCIHARClient(fl.client.NumPyClient):
+        def get_parameters(self, config):
+            return model.get_weights()
 
-#         def fit(self, parameters, config):
-#             model.set_weights(parameters)
-#             model.fit(X_user_train, y_user_train, epochs=1, batch_size=32, steps_per_epoch=3)
-#             return model.get_weights(), len(X_user_train), {}
+        def fit(self, parameters, config):
+            model.set_weights(parameters)
+            # model.fit(X_user_train, y_user_train, epochs=1, batch_size=32, steps_per_epoch=3)
+            model.fit(X_user_train, y_user_train, epochs=10, batch_size=32)
+            return model.get_weights(), len(X_user_train), {}
 
-#         def evaluate(self, parameters, config):
-#             model.set_weights(parameters)
-#             loss, accuracy = model.evaluate(X_user_test, y_user_test)
-#             return loss, len(X_user_test), {"accuracy": float(accuracy)}
+        def evaluate(self, parameters, config):
+            model.set_weights(parameters)
+            loss, accuracy = model.evaluate(X_user_test, y_user_test)
+            return loss, len(X_user_test), {"accuracy": float(accuracy)}
     
 
-# # start the client
-# fl.client.start_client(server_address="[::]:8080", client=UCIHARClient().to_client())
+# start the client
+fl.client.start_client(server_address="[::]:8080", client=UCIHARClient().to_client())
