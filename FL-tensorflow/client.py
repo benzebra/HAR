@@ -12,7 +12,6 @@ from sklearn.preprocessing import StandardScaler
 
 import argparse
 import warnings
-import utils
 
 N_CLIENTS = 30
 
@@ -35,7 +34,7 @@ model = tf.keras.Sequential([
     layers.Dense(256, activation='relu'),
     layers.Dropout(0.5),
     layers.Dense(128, activation='relu'),
-    layers.Dense(6, activation='softmax')
+    layers.Dense(7, activation='softmax')
 ])
 model.compile("adam", "sparse_categorical_crossentropy", metrics=["accuracy"])
 
@@ -98,20 +97,23 @@ def getData(user):
 
     df_ext_train = df_ext_train.T
     y_ext_train = y_ext_train.T
-    X_train = np.array(df_ext_train)
-    y_train = np.array(y_ext_train)
-
     df_ext_test = df_ext_test.T
     y_ext_test = y_ext_test.T
+
+    X_train = np.array(df_ext_train)
+    y_train = np.array(y_ext_train)
     X_test = np.array(df_ext_test)
     y_test = np.array(y_ext_test)
 
-    # TODO: 
-    # if test.shape = [0,0] and train.shape != [0,0] use the train_test_split function
-    # train_test_split(X, y, random_state=42, test_size=0.3)
-    # 
-    # if train.shape = [0,0] but test.shape != [0,0] ... ???
-
+    if (len(y_train) == 0) | (len(y_test) == 0):
+        if (len(y_train) == 0) & (len(y_test) == 0):
+            X_train, X_test, y_train, y_test = np.array()
+        else:
+            if (len(y_train) == 0):
+                X_train, X_test, y_train, y_test = train_test_split(X_test, y_test, random_state=42, test_size=0.3)
+            else:
+                X_train, X_test, y_train, y_test = train_test_split(X_train, y_train, random_state=42, test_size=0.3)
+        
     return X_train, y_train, X_test, y_test
 
 if __name__ == "__main__":
@@ -132,27 +134,24 @@ if __name__ == "__main__":
 
     X_train, y_train, X_test, y_test = getData(user)
 
-    print(f"train shape: X-" + str(X_train.shape) + " y-" + str(y_train.shape))
-    print(f"test shape: X-" + str(X_test.shape) + " y-" + str(y_test.shape))
+    # print(f"train shape: X-" + str(X_train.shape) + " y-" + str(y_train.shape))
+    # print(f"test shape: X-" + str(X_test.shape) + " y-" + str(y_test.shape))
 
-#     utils.set_initial_params(model)   
+    class UCIHARClient(fl.client.NumPyClient):
+        def get_parameters(self, config):
+            return model.get_weights()
 
+        def fit(self, parameters, config):
+            model.set_weights(parameters)
+            # model.fit(X_user_train, y_user_train, epochs=1, batch_size=32, steps_per_epoch=3)
+            model.fit(X_train, y_train, epochs=3, batch_size=32)
+            return model.get_weights(), len(X_train), {}
 
-#     class UCIHARClient(fl.client.NumPyClient):
-#         def get_parameters(self, config):
-#             return model.get_weights()
-
-#         def fit(self, parameters, config):
-#             model.set_weights(parameters)
-#             # model.fit(X_user_train, y_user_train, epochs=1, batch_size=32, steps_per_epoch=3)
-#             model.fit(X_train, y_train, epochs=10, batch_size=32)
-#             return model.get_weights(), len(X_train), {}
-
-#         def evaluate(self, parameters, config):
-#             model.set_weights(parameters)
-#             loss, accuracy = model.evaluate(X_test, y_test)
-#             return loss, len(X_test), {"accuracy": float(accuracy)}
+        def evaluate(self, parameters, config):
+            model.set_weights(parameters)
+            loss, accuracy = model.evaluate(X_test, y_test)
+            return loss, len(X_test), {"accuracy": float(accuracy)}
     
 
-# # start the client
-# fl.client.start_client(server_address="[::]:8080", client=UCIHARClient().to_client())
+# start the client
+fl.client.start_client(server_address="[::]:8080", client=UCIHARClient().to_client())
