@@ -27,7 +27,7 @@ strategy = fl.server.strategy.FedAvg(
     min_evaluate_clients=3,             # Never sample less than 5 clients for evaluation
     min_available_clients=int(
         3
-    ),                                  # Wait until at least 75 clients are available
+    ),                                  # Wait until at least 3 clients are available
     evaluate_metrics_aggregation_fn=weighted_average,  # aggregates federated metrics
     # evaluate_fn=get_evaluate_fn(centralized_testset),  # global evaluation function
 )
