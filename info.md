@@ -57,3 +57,20 @@ Used model un tensorflow scritps
 | 4   | Dropout(0.5)                                                   | Dropout 50% | ---         |
 | 5   | Dense(128, activation='relu')                                  | ReLU        | 256 -> 128  |
 | 6   | Dense(6, activation='softmax')                                 | SoftMax     | 128 -> 6    |
+
+---
+
+### TO DEV
+1. UCI HAR insights (dataset imbalance)
+2. FL on UCI HAR with vertical hybridation (0% - 100% on user numbers)
+3. FL on UCI HAR with horizontal hybridation (0% - 100% on user data)
+4. FL on FEMNIST with vertical hybridation (0% - 100% on user numbers)
+5. FL on FEMNIST with horizontal hybridation (0% - 100% on user data)
+6. Graphs
+
+## Graphs
+Seaborn
+1. y=acc, x=%(vert & hor) (UCI HAR)
+2. y=acc, x=%(vert & hor) (FEMNIST)
+3. y=f1, x=%(vert & hor) (UCI HAR)
+4. y=f1, x=%(vert & hor) (FEMNIST)
