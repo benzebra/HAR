@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "fl-tensorflow-v2"
+version = "1.0.0"
+description = ""
+authors = [
+    { name = "The Flower Authors", email = "hello@flower.ai" },
+]
+license = { text = "Apache License (2.0)" }
+dependencies = [
+    "flwr[simulation]>=1.8.0,<2.0",
+    "flwr-datasets[vision]>=0.0.2,<1.0.0",
+    "tensorflow>=2.11.1",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+
+[flower]
+publisher = "filippo"
+
+[flower.components]
+serverapp = "fl_tensorflow_v2.server:app"
+clientapp = "fl_tensorflow_v2.client:app"
+
+[flower.engine]
+name = "simulation"
+
+[flower.engine.simulation.supernode]
+num = 2
