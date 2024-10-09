@@ -4,4 +4,6 @@ FL-sklearn/__pycache__
 /FL-pytorch-test
 /FL-pytorch
 .DS_Store
+/fl-test
+fl-tensorflow-v2/fl_tensorflow_v2/test.ipynb
 # info.md
