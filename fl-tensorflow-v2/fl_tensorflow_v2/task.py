@@ -36,34 +36,31 @@ DF = pd.concat([DF_TRAIN, DF_TEST], axis=0, ignore_index=True)
 
 
 # Make TensorFlow log less verbose
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
+os.environ["RAY_DEDUP_LOGS"] = "0"
 
 def load_model():
     # print("task.py: loading model")
     model = tf.keras.Sequential([
         # tf.keras.layers.Dense(50, input_shape=(561, ), activation='relu'),
         # tf.keras.layers.Dense(6, activation='softmax')
-        tf.keras.layers.Input(shape=(561, )),
-        tf.keras.layers.Dense(50),
-        tf.keras.layers.Dense(6)
+        tf.keras.layers.Input(shape=(560, )),
+        tf.keras.layers.Dense(50, activation='relu'),
+        tf.keras.layers.Dense(7, activation='softmax')
     ])
     # print("task.py: compiling model")
-    model.compile(
-        "adam", 
-        loss="sparse_categorical_crossentropy", 
-        metrics=["accuracy"]
-    )
+    model.compile("adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"])
     # print(f"task.py: returning model {model}")
     return model
 
 def load_data(partition_id, num_partitions):
     # print(f"task.py: loading data for: {partition_id}")
-    X, Y = get_data(partition_id+1)
+    X, Y = get_data(num_partitions-partition_id)
     x_train, x_test, y_train, y_test = train_test_split(X, Y, random_state=42, test_size=0.3)
     # x_train, x_test, y_train, y_test = train_test_split(X, Y.iloc[:,1], random_state=42, test_size=0.3, stratify=Y.iloc[:,1])
 
     # print(f"task.py: data type:{x_train.dtype}")
-    return x_train, y_train, x_test, y_test
+    return x_train, x_test, y_train, y_test
 
 def get_data(id):
     # print(f"task.py: loading data for: {id}")
@@ -72,7 +69,7 @@ def get_data(id):
     ID_DF = DF[DF[0] == id]
 
     # return X, Y
-    return ID_DF.iloc[:, 1:562], ID_DF.iloc[:, 562]
+    return ID_DF.iloc[:, 2:562], ID_DF.iloc[:, 1]
 
 
 # this file has data & model so 
