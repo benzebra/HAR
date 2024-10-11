@@ -60,17 +60,13 @@ def load_data(partition_id, num_partitions):
             X, Y = get_data(0)
             usr_out = max(DF[0])
             for n in range(num_partitions, usr_out+1):
-                print(f"n: {n}")
                 X_tmp, Y_tmp = get_data(n)
 
                 X = pd.concat([X, X_tmp], ignore_index=False)
                 Y = pd.concat([Y, Y_tmp], ignore_index=False)
-            print(f"X: {len(X)}")
         else:
             i = i-1
-            print(f"i: {i}")
             X, Y = get_data(i)
-
 
     elif(HYB_STATUS == 2):
         if(i == 1):
@@ -93,8 +89,9 @@ def load_data(partition_id, num_partitions):
 
             X = X_tmp
             Y = Y_tmp
-        
+              
     x_train, x_test, y_train, y_test = train_test_split(X, Y, random_state=42, test_size=0.3)
+    
     return x_train, x_test, y_train, y_test
 
 def get_data(id):
