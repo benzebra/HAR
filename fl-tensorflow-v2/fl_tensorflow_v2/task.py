@@ -31,43 +31,64 @@ DF_TEST = pd.concat([DF_USER_TEST, DF_Y_TEST, DF_X_TEST], axis=1, ignore_index=T
 DF_TRAIN = pd.concat([DF_USER_TRAIN, DF_Y_TRAIN, DF_X_TRAIN], axis=1, ignore_index=True)
 DF = pd.concat([DF_TRAIN, DF_TEST], axis=0, ignore_index=True)
 
-# print("task.py: importing data")
-# print(f"task.py: X_TEST: {X_TEST}")
 
-
-# Make TensorFlow log less verbose
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
 
+# 0=None, 1=Vertical, 2=Horizontal
+HYB_STATUS = 2
+HYB_PERCENTAGE = 0.5
+
+
 def load_model():
-    # print("task.py: loading model")
     model = tf.keras.Sequential([
-        # tf.keras.layers.Dense(50, input_shape=(561, ), activation='relu'),
-        # tf.keras.layers.Dense(6, activation='softmax')
         tf.keras.layers.Input(shape=(560, )),
         tf.keras.layers.Dense(50, activation='relu'),
         tf.keras.layers.Dense(7, activation='softmax')
     ])
-    # print("task.py: compiling model")
     model.compile("adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"])
-    # print(f"task.py: returning model {model}")
+
     return model
 
 def load_data(partition_id, num_partitions):
-    # print(f"task.py: loading data for: {partition_id}")
-    X, Y = get_data(num_partitions-partition_id)
-    x_train, x_test, y_train, y_test = train_test_split(X, Y, random_state=42, test_size=0.3)
-    # x_train, x_test, y_train, y_test = train_test_split(X, Y.iloc[:,1], random_state=42, test_size=0.3, stratify=Y.iloc[:,1])
+    i = num_partitions-partition_id
 
-    # print(f"task.py: data type:{x_train.dtype}")
+    if(HYB_STATUS == 0):
+        X, Y = get_data(i)
+        x_train, x_test, y_train, y_test = train_test_split(X, Y, random_state=42, test_size=0.3)
+
+    elif(HYB_STATUS == 1):
+        X, Y = get_data(i)
+        x_train, x_test, y_train, y_test = train_test_split(X, Y, random_state=42, test_size=0.3)
+
+    elif(HYB_STATUS == 2):
+        if(i == 1):
+            X, Y = get_data(0)
+            for n in range(1, num_partitions):
+                X_tmp, Y_tmp = get_data(n)
+
+                perc = int(len(X_tmp)-len(X_tmp)*HYB_PERCENTAGE)
+
+                X = pd.concat([X, X_tmp[perc:]], ignore_index=False)
+                Y = pd.concat([Y, Y_tmp[perc:]], ignore_index=False)
+        else: 
+            i = i-1
+            X, Y = get_data(i)
+
+            perc = int(len(X)-len(X)*HYB_PERCENTAGE)
+
+            X_tmp = X[:perc]
+            Y_tmp = Y[:perc]
+
+            X = X_tmp
+            Y = Y_tmp
+        
+        x_train, x_test, y_train, y_test = train_test_split(X, Y, random_state=42, test_size=0.3)
+
     return x_train, x_test, y_train, y_test
 
 def get_data(id):
-    # print(f"task.py: loading data for: {id}")
-
-    # get the user data
     ID_DF = DF[DF[0] == id]
 
-    # return X, Y
     return ID_DF.iloc[:, 2:562], ID_DF.iloc[:, 1]
 
 

@@ -4,12 +4,11 @@ import os
 from flwr.client import NumPyClient, ClientApp
 from fl_tensorflow_v2.task import load_data, load_model
 
-USERS = 30
+USERS = 31
 EPOCHS = 10
 
 # Define Flower Client and client_fn
 class FlowerClient(NumPyClient):
-    # print("client.py: FlowerClient class")
     def __init__(self, model, x_train, x_test, y_train, y_test):
         self.model = model
         self.x_train = x_train
@@ -34,9 +33,6 @@ class FlowerClient(NumPyClient):
 
 
 def client_fn(cid):
-    # print(f"client.py: CID: {cid}")
-    # print(f"client.py: Client {cid} loading model and data")
-    # Load model and data
     net = load_model()
     x_train, x_test, y_train, y_test = load_data(int(cid), USERS)
 
@@ -48,7 +44,6 @@ def client_fn(cid):
 app = ClientApp(
     client_fn=client_fn,
 )
-# print(f"client.py: app: {app}")
 
 
 # Add f1 score in the evaluation returns        |
