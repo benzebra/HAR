@@ -4,7 +4,7 @@ import os
 from flwr.client import NumPyClient, ClientApp
 from fl_tensorflow_v2.task import load_data, load_model
 
-USERS = 31
+USERS = 16
 EPOCHS = 10
 
 # Define Flower Client and client_fn

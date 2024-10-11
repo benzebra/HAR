@@ -9,7 +9,7 @@ from typing import List, Tuple
 
 from fl_tensorflow_v2.task import load_model
 
-USERS = 31
+USERS = 16
 ROUNDS = 1
 
 # Define config
