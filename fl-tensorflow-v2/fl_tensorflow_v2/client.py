@@ -4,7 +4,8 @@ import os
 from flwr.client import NumPyClient, ClientApp
 from fl_tensorflow_v2.task import load_data, load_model
 
-os.environ["RAY_DEDUP_LOGS"] = "0"
+USERS = 30
+EPOCHS = 10
 
 # Define Flower Client and client_fn
 class FlowerClient(NumPyClient):
@@ -21,7 +22,7 @@ class FlowerClient(NumPyClient):
 
     def fit(self, parameters, config):
         self.model.set_weights(parameters)
-        self.model.fit(self.x_train, self.y_train, epochs=30, batch_size=32, verbose=0)
+        self.model.fit(self.x_train, self.y_train, epochs=EPOCHS, batch_size=32, verbose=0)
         return self.model.get_weights(), len(self.x_train), {}
 
     def evaluate(self, parameters, config):
@@ -37,7 +38,7 @@ def client_fn(cid):
     # print(f"client.py: Client {cid} loading model and data")
     # Load model and data
     net = load_model()
-    x_train, x_test, y_train, y_test = load_data(int(cid), 30)
+    x_train, x_test, y_train, y_test = load_data(int(cid), USERS)
 
     # Return Client instance
     return FlowerClient(net, x_train, x_test, y_train, y_test).to_client()

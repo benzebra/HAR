@@ -37,7 +37,6 @@ DF = pd.concat([DF_TRAIN, DF_TEST], axis=0, ignore_index=True)
 
 # Make TensorFlow log less verbose
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
-os.environ["RAY_DEDUP_LOGS"] = "0"
 
 def load_model():
     # print("task.py: loading model")

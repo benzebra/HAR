@@ -9,11 +9,12 @@ from typing import List, Tuple
 
 from fl_tensorflow_v2.task import load_model
 
-os.environ["RAY_DEDUP_LOGS"] = "0"
+USERS = 30
+ROUNDS = 1
 
 # Define config
 # print("ServerApp: Defining config")
-config = ServerConfig(num_rounds=5)
+config = ServerConfig(num_rounds=ROUNDS)
 # print(f"ServerApp: Config: {config}")
 
 # print("ServerApp: Loading model")
@@ -43,7 +44,7 @@ def simple_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
 strategy = FedAvg(
     fraction_fit=1.0,
     fraction_evaluate=1.0,
-    min_available_clients=30,
+    min_available_clients=USERS,
     initial_parameters=parameters,
     evaluate_metrics_aggregation_fn=simple_average,
     # evaluate_metrics_aggregation_fn=weighted_average,
