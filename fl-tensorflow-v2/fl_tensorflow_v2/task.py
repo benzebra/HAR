@@ -28,8 +28,8 @@ DF_FEM = pd.read_parquet("hf://datasets/flwrlabs/femnist/data/train-00000-of-000
 DF_WRITERS = DF_FEM["writer_id"].unique()
 
 # 0=None, 1=Vertical, 2=Horizontal
-HYB_STATUS = 1
-HYB_PERCENTAGE = 0.5
+HYB_STATUS = 2
+HYB_PERCENTAGE = 1.0
 
 # 0=HAR, 1=FEMNIST
 HAR = 1
@@ -109,6 +109,7 @@ def load_model():
         # model = CnnEmnist(62, featmaps, kernels, first_linear_size, linears)
 
     model.compile("adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"])
+    # model.compile("adam", loss="sparse_categorical_crossentropy", metrics=["accuracy", "f1_score"])
 
     return model
 
@@ -139,15 +140,19 @@ def load_data(partition_id, num_partitions):
                 Y = Y.drop(Y.index)
                 X = np.empty((0, 28, 28, 1))
                 usr_out = get_max()
-                for n in range(num_partitions, usr_out+1):
+                for n in range(num_partitions-1, usr_out):
+                    print(f"n: {n}")
                     X_tmp, Y_tmp = get_data(n)
                     X = np.concatenate((X, X_tmp), axis=0)
                     Y = pd.concat([Y, Y_tmp], ignore_index=False)
+                print(len(X))
         else:
             if(HAR==0):
                 i = i-1
+                print(f"i: {i}")
             else:
                 i = i-2
+                print(f"i: {i}")
             X, Y = get_data(i)
 
     elif(HYB_STATUS == 2):
@@ -182,6 +187,7 @@ def load_data(partition_id, num_partitions):
                 i = i-1
             else:
                 i = i-2
+            print(i)
             X, Y = get_data(i)
 
             perc = int(len(X)-len(X)*HYB_PERCENTAGE)
@@ -226,9 +232,11 @@ def get_data(id):
 
 def get_max():
     if(HAR==0):
+        return 30
         return max(DF_HAR[0])
     else:
         # taglia array 
+        return 50
         return len(DF_WRITERS)
 
 # def delete_data(X, Y):
@@ -244,4 +252,4 @@ def get_max():
 # this file has data & model so 
 #  - i've to modify the data in order to change with the user data                          | DONE (to test)
 #  - i've to modify the model in order to use the same model as the torch file (repo)       | DONE (to test)
-#  - FEMNIST???                                                                             |
+#  - FEMNIST???                                                                             | DONE

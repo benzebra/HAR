@@ -13,7 +13,7 @@ from fl_tensorflow_v2.task import load_model
 # HYB_STATUS = 0
 
 # HYB_PERCENTAGE = 0.5
-USERS = 10
+USERS = 51
 ROUNDS = 1
 # EPOCHS = 10
 
@@ -25,10 +25,11 @@ parameters = ndarrays_to_parameters(load_model().get_weights())
 def simple_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
     s_accuracies = [m["accuracy"] for _, m in metrics]
     clients_num = len(metrics)
+    accuracy = sum(s_accuracies) / clients_num
 
-    print_values()
+    print_values(accuracy)
 
-    return {"accuracy": sum(s_accuracies)/clients_num}
+    return {"accuracy": accuracy}
 
 strategy = FedAvg(
     fraction_fit=1.0,
@@ -43,5 +44,7 @@ app = ServerApp(
     strategy=strategy,
 )
 
-def print_values():
+def print_values(accuracy):
+    with open("metrics.txt", "a") as file:
+        file.write(f"{accuracy},")
     return

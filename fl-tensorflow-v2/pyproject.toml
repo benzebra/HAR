@@ -30,4 +30,4 @@ clientapp = "fl_tensorflow_v2.client:app"
 name = "simulation"
 
 [flower.engine.simulation.supernode]
-num = 10
+num = 51

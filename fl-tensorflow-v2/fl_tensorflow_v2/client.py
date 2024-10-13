@@ -5,7 +5,7 @@ from flwr.client import NumPyClient, ClientApp
 from fl_tensorflow_v2.task import load_data, load_model
 # from fl_tensorflow_v2.task import USERS, EPOCHS
 
-USERS = 10
+USERS = 51
 EPOCHS = 10
 
 # Define Flower Client and client_fn
@@ -36,11 +36,13 @@ class FlowerClient(NumPyClient):
     def evaluate(self, parameters, config):
         self.model.set_weights(parameters)
         # loss, accuracy = self.model.evaluate(self.x_test, self.y_test)
+        # loss, accuracy, f1_score = self.model.evaluate(self.test_dataset)
         loss, accuracy = self.model.evaluate(self.test_dataset)
+        print(self.model.metrics_names)
         # print(len(self.x_test))
         # float, int, {srt: float}
-        # return loss, len(self.x_test), {"accuracy": float(accuracy)}
-        return loss, len(self.test_dataset), {"accuracy": float(accuracy)}       # f1 score
+        return loss, len(self.test_dataset), {"accuracy": float(accuracy)}
+        # return loss, len(self.test_dataset), {"accuracy": float(accuracy)}, {"f1_score": float(f1_score)}       # f1 score
 
 
 def client_fn(cid):
@@ -61,5 +63,5 @@ app = ClientApp(
 
 # Add f1 score in the evaluation returns        |
 # Adjust the number of the epochs               | DONE  
-# FEMNIST ???                                   |
+# FEMNIST ???                                   | DONE
 # Check cid (maybe it starts from 0)            | DONE
