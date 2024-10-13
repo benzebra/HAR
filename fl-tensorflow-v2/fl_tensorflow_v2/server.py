@@ -9,8 +9,13 @@ from typing import List, Tuple
 
 from fl_tensorflow_v2.task import load_model
 
-USERS = 16
+# # 0=None, 1=Vertical, 2=Horizontal
+# HYB_STATUS = 0
+
+# HYB_PERCENTAGE = 0.5
+USERS = 10
 ROUNDS = 1
+# EPOCHS = 10
 
 # Define config
 config = ServerConfig(num_rounds=ROUNDS)
@@ -20,6 +25,8 @@ parameters = ndarrays_to_parameters(load_model().get_weights())
 def simple_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
     s_accuracies = [m["accuracy"] for _, m in metrics]
     clients_num = len(metrics)
+
+    print_values()
 
     return {"accuracy": sum(s_accuracies)/clients_num}
 
@@ -35,3 +42,6 @@ app = ServerApp(
     config=config,
     strategy=strategy,
 )
+
+def print_values():
+    return
