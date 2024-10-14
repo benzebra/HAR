@@ -34,56 +34,11 @@ HYB_PERCENTAGE = 1.0
 # 0=HAR, 1=FEMNIST
 HAR = 1
 
-featmaps = [32, 64, 128]      # Example values for feature maps (number of filters)
-kernels = [3, 3, 3]           # Example kernel sizes
+featmaps = [32, 64, 128]                                        # Example values for feature maps (number of filters)
+kernels = [3, 3, 3]                                             # Example kernel sizes
 first_linear_size = featmaps[2] * kernels[2] * kernels[2]       # Example size after flattening (depends on input size and feature maps)
-linears = [512, 256, 62]          # Example sizes of the fully connected layers
-num_classes = 62  
-
-class CnnEmnist(tf.keras.Model):
-    def __init__(self, num_classes, featmaps, kernels, first_linear_size, linears):
-        super(CnnEmnist, self).__init__()
-
-        # MaxPooling layer
-        self.pool = tf.keras.layers.MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='valid')
-
-        # 3 Convolutional layers
-        self.conv1 = tf.keras.layers.Conv2D(
-            filters=featmaps[0], kernel_size=kernels[0], padding='same', activation='relu', input_shape=(28, 28, 1)
-        )
-        self.conv2 = tf.keras.layers.Conv2D(
-            filters=featmaps[1], kernel_size=kernels[1], padding='same', activation='relu'
-        )
-        self.conv3 = tf.keras.layers.Conv2D(
-            filters=featmaps[2], kernel_size=kernels[2], padding='same', activation='relu'
-        )
-
-        # 2 Fully connected layers
-        self.fc1 = tf.keras.layers.Dense(linears[0], activation='relu')
-        self.fc2 = tf.keras.layers.Dense(linears[1])
-
-        # Output layer (using softmax for classification)
-        self.fc3 = tf.keras.layers.Dense(num_classes, activation='softmax')
-
-        # Flattening layer
-        self.flatten = tf.keras.layers.Flatten()
-
-    def call(self, x):
-        # Pass through 3 Conv + Pool layers
-        x = self.pool(self.conv1(x))
-        x = self.pool(self.conv2(x))
-        x = self.pool(self.conv3(x))
-
-        # Flatten before passing through fully connected layers
-        x = self.flatten(x)
-
-        # Fully connected layers
-        x = self.fc1(x)
-        x = self.fc2(x)
-
-        # Output layer
-        out = self.fc3(x)
-        return out
+linears = [512, 256, 62]                                        # Example sizes of the fully connected layers
+num_classes = 62                                                # Number of classes in FEMNIST
 
 def load_model():
     if(HAR == 0):
@@ -106,7 +61,6 @@ def load_model():
             tf.keras.layers.Dense(linears[1]),
             tf.keras.layers.Dense(num_classes, activation='log_softmax'),
         ])
-        # model = CnnEmnist(62, featmaps, kernels, first_linear_size, linears)
 
     model.compile("adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"])
     # model.compile("adam", loss="sparse_categorical_crossentropy", metrics=["accuracy", "f1_score"])
@@ -197,7 +151,6 @@ def load_data(partition_id, num_partitions):
 
             X = X_tmp
             Y = Y_tmp
-            # print(f"user: {i} load data X: {len(X)}")
                 
     x_train, x_test, y_train, y_test = train_test_split(X, Y, random_state=42, test_size=0.3)
 
@@ -238,18 +191,3 @@ def get_max():
         # taglia array 
         return 50
         return len(DF_WRITERS)
-
-# def delete_data(X, Y):
-#     if(HAR==0):
-#         X = X.drop(X.index)
-#         Y = Y.drop(Y.index)
-#     else:
-#         X.clear()
-        
-#         Y = Y.drop(Y.index)
-    
-
-# this file has data & model so 
-#  - i've to modify the data in order to change with the user data                          | DONE (to test)
-#  - i've to modify the model in order to use the same model as the torch file (repo)       | DONE (to test)
-#  - FEMNIST???                                                                             | DONE
