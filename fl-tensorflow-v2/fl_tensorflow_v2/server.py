@@ -1,4 +1,13 @@
 """FL-tensorflow-v2: A Flower / TensorFlow app."""
+# import numpy as np
+
+# USERS = 46
+# ROUNDS = 1
+# MAX = 50
+# HYB_PERCENTAGE = 0.1
+
+# users_to_fed = np.random.choice(MAX, int(MAX*HYB_PERCENTAGE), replace=False)
+# print(f"users_to_fed: {users_to_fed}")
 
 import os
 from flwr.common import ndarrays_to_parameters, Metrics
@@ -7,14 +16,19 @@ from flwr.server.strategy import FedAvg
 
 from typing import List, Tuple
 
+USERS = 31
+ROUNDS = 1
+MAX = 30
+HYB_PERCENTAGE = 0.1
+
+
 from fl_tensorflow_v2.task import load_model
 
 # # 0=None, 1=Vertical, 2=Horizontal
 # HYB_STATUS = 0
 
 # HYB_PERCENTAGE = 0.5
-USERS = 51
-ROUNDS = 1
+
 # EPOCHS = 10
 
 # Define config
@@ -45,6 +59,6 @@ app = ServerApp(
 )
 
 def print_values(accuracy):
-    with open("metrics.txt", "a") as file:
+    with open("metrics_har_hor_10t.txt", "a") as file:
         file.write(f"{accuracy},")
     return
