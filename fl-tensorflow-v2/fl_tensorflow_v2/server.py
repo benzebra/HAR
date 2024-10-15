@@ -18,18 +18,8 @@ from typing import List, Tuple
 
 USERS = 31
 ROUNDS = 1
-MAX = 30
-HYB_PERCENTAGE = 0.1
-
 
 from fl_tensorflow_v2.task import load_model
-
-# # 0=None, 1=Vertical, 2=Horizontal
-# HYB_STATUS = 0
-
-# HYB_PERCENTAGE = 0.5
-
-# EPOCHS = 10
 
 # Define config
 config = ServerConfig(num_rounds=ROUNDS)
